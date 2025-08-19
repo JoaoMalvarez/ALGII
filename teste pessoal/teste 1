@@ -1,0 +1,20 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
+int(main) {
+	int dado, palpite;
+	srand(time(NULL));
+	dado = rand() % 6 + 1;
+
+	print("Tente adivinhar o número do dado");
+	scanf("%d", &palpite);
+	if (palpite < 1 || palpite > 6) {
+	printf("Palpite inválido, têm que estar entre 1 e 6./n");
+	} else if (palpite = dado) {
+	printf("Você acertou! :)");
+	} else {
+	printf("Você errou! :(" ,dado);
+	}
+	printf("Valor do dado lançado %d\n" ,dado);
+	return 0;
+}
