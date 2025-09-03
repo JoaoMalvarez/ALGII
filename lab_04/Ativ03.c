@@ -1,49 +1,54 @@
 #include <stdio.h>
 
-char aprovaAluno(int nota[], int qntdAlunos, char nomeAluno[]) {
-     printf("Quantos alunos existem na turma? ");
-    scanf("%d", &qntdAlunos);
-    printf("Insira o Nome do aluno");
-    scanf("%s", &nomeAluno);
-    printf("Insira a nota do aluno %s: ", nomeAluno);
-    scanf("%d", &nota);
-    int nota, aprovaAluno;
+float calcularMediaTurma(float notas[], int qntdAlunos) {
+    float soma = 0;
     for (int i = 0; i < qntdAlunos; i++) {
-        if (nota >= 7){
-             aprovaAluno = "aprovado";
+        soma += notas[i];
     }
-        else {
-        aprovaAluno = "reprovado";
+    return soma / qntdAlunos;
+}
+
+void imprimirResultados(char nomes[][50], float notas[], int qntdAlunos) {
+    int aprovados = 0, recuperacao = 0;
+
+    for (int i = 0; i < qntdAlunos; i++) {
+        if (notas[i] >= 7.0) {
+            printf("Aluno %s: nota %.2f -> Aprovado\n", nomes[i], notas[i]);
+            aprovados++;
+        } else {
+            printf("Aluno %s: nota %.2f -> Recuperação\n", nomes[i], notas[i]);
+            recuperacao++;
         }
- }
-        
+    }
 
-    aprovaAluno = nota >= 7;
-    return aprovaAluno;
+    printf("\nTotal de aprovados: %d\n", aprovados);
+    printf("Total de recuperação: %d\n", recuperacao);
 }
 
-int calcularMediaTurma(int nota[], int qntdAlunos) {
-    int totalnotas = 0;
+int main() {
+    int qntdAlunos;
+
+    printf("Quantos alunos existem na turma? ");
+    scanf("%d", &qntdAlunos);
+
+    float notas[qntdAlunos];
+    char nomes[qntdAlunos][50]; // cada linha é o nome de um aluno
+
+    // Cadastro de alunos
     for (int i = 0; i < qntdAlunos; i++) {
-        totalnotas += nota[i];
-   }
-   printf("A média da tuma foi: %d\n", totalnotas / qntdAlunos);
-   return totalnotas;
-}
+        printf("\nDigite o nome do aluno %d: ", i + 1);
+        scanf("%s", nomes[i]);
 
-int imprimirResultados(int qntdAlunos, int totalnotas, char nomeAluno[], char aprovaAluno) {
-    printf("n");
-    printf("A nota do aluno %s foram: %d\n Ela(e), foi %s", nomeAluno, totalnotas, aprovaAluno);
-    return imprimirResultados;
-}
+        printf("\nDigite a nota do aluno %s: ", nomes[i]);
+        scanf("%f", &notas[i]);
+    }
 
+    // Calcular média da turma
+    float media = calcularMediaTurma(notas, qntdAlunos);
+    printf("\nMédia da turma: %.2f\n\n", media);
 
-int main(int totalnotas, int qntdAlunos) {
-    int qntdAlunos; totalnotas; imprimirResultados;
-    int notas[qntdAlunos];
-    for (int i = 0; i < qntdAlunos; i++) {
-        scanf("%d", &notas[i]);
-        printf("Nota[%d]: %d\n", i, notas[i]);
-    };
+    // Mostrar resultados
+    imprimirResultados(nomes, notas, qntdAlunos);
+
     return 0;
 }
