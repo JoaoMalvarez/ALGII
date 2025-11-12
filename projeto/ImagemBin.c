@@ -109,18 +109,40 @@ void abrirArquivo(int largura, int altura) { //abre o arquivo e fica disponivel 
     }
 }
 
-//--------------------------------------------
-
-void separaImagem(int largura, int altura) { // vai separar a imagem em quadrantes
-                    //lembrando, se o n ou m forem numeros impares, é para arredondar para cima (ao dividir no meio)
-
-}
 
 //--------------------------------------------
 
 char codificaImagem() { //vai traduzir os quadrantes (P = Preto, B = Branco, X = começo do bloco)
-                        //lembrando, se o quadrante inteiro for da msm cor, só coloca um "P" ou "B"
+    for(int i = 0; i < altura; i++) { //lembrando, se o quadrante inteiro for da msm cor, só coloca um "P" ou "B"
+        for(int j = 0; j < largura; j++) {
+            char codigo = "X";
+            if (data[i][j] == PRETO) { //ou se não funcionar, troca PRETO por 1
+                codigo = codigo + "P";
+            } else if (data[i][j] == BRANCO) {//ou se não funcionar, troca BRANCO por 0
+                codigo = codigo + "B";
+            }
+        }
+    }
+    return codigo;
 }
+
+//--------------------------------------------
+
+void separaImagem(int largura, int altura) { // vai separar a imagem em quadrantes
+    int meioX = (largura + 1) / 2; // arredonda para cima o "(...+ 1)"
+    int meioY = (altura + 1) / 2;
+    char codigo = codificaImagem();
+    while (meioX > 1 || meioY > 1) {
+        meioX = (meioX + 1) / 2; 
+        meioY = (meioY + 1) / 2;
+        printf("\n");
+        printf("%d", data[altura][largura]);
+        printf("%c", codigo);
+        largura = meioX;
+        altura = meioY;
+    }
+}    //lembrando, se o n ou m forem numeros impares, é para arredondar para cima (ao dividir no meio)
+
 
 //--------------------------------------------
 
