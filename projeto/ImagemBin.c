@@ -77,7 +77,7 @@ void abrirArquivo(int largura, int altura) { //abre o arquivo e fica disponivel 
             if (fgets(linha, sizeof(linha), file) != NULL) {
             printf("%s", linha);
             }
-            if (sscanf(linha, "%d %d", &largura, &altura) == 2) {
+            if (sscanf(linha, "%d %d", &altura, &largura) == 2) {
                 break;
                 }
                 printf("Erro ao ler dimensões da imagem.\n");
