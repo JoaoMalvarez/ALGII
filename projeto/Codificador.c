@@ -15,6 +15,7 @@ typedef struct {
     int dados[ALTURA_MAX * LARGURA_MAX]; 
 } Imagem; 
 
+
 Imagem imagemEstaticaGlobal;
 char CodigoFinalGlobal[TAMANHO_MAX];
 int indiceCodificacaoGlobal = 0;
@@ -84,10 +85,6 @@ char* codifica(Imagem* original_img, int inicio_r, int inicio_c, int a, int l) {
     
     if (indiceCodificacaoGlobal < TAMANHO_MAX - 2) {
         CodigoFinalGlobal[indiceCodificacaoGlobal++] = char_codigo;
-        
-        if (char_codigo == 'X') {
-            CodigoFinalGlobal[indiceCodificacaoGlobal++] = ' ';
-        }
         
     } else {
         printf("\nErro.\n");
@@ -169,7 +166,7 @@ Imagem* ler_arquivo_pbm(const char *nome_arquivo) {
     
     pularComentariosEspacos(arquivo);
     
-    if (fscanf(arquivo, "%d %d", &l, &a) != 2) {
+    if (fscanf(arquivo, "%d %d", &a, &l) != 2) {
         printf("Erro: Dimensões não encontradas ou inválidas.\n");
         fclose(arquivo); 
         return NULL;
@@ -187,7 +184,6 @@ Imagem* ler_arquivo_pbm(const char *nome_arquivo) {
             int indice = i * img->l + j;
             if (fscanf(arquivo, "%d", &(img->dados[indice])) != 1) { 
                 printf("Erro ao ler pixel em (%d, %d).\n", i, j); 
-                liberaImagem(img); 
                 fclose(arquivo); 
                 return NULL;
             }
@@ -229,12 +225,10 @@ Imagem* ler_imagem_manual() {
             printf("Pixel [%d, %d]: ", i + 1, j + 1);
             if (scanf("%d", &pixel_lido) != 1) {
                 printf("Erro: Entrada não é um número. Saindo.\n");
-                liberaImagem(img);
                 return NULL;
             }
             if (pixel_lido != PRETO && pixel_lido != BRANCO) {
                 printf("Erro: Pixel deve ser 0 (Branco) ou 1 (Preto). Saindo.\n");
-                liberaImagem(img);
                 return NULL;
             }
             int indice = i * img->l + j;
@@ -251,15 +245,16 @@ Imagem* ler_imagem_manual() {
 void ajuda(const char *nome_programa) {
     printf("Uso: %s [-? | -m | -f ARQ]\n\n", nome_programa);
     printf("Argumentos:\n");
-    printf("-?, --help  : apresenta essa orientação na tela.\\n");
-    printf("-m, --manual : ativa o modo de entrada manual, em que o usuário fornece\\n");
-    printf("               todos os dados da imagem informando-os através do teclado.\\n");
-    printf("-f, --file  : considera a imagem representada no arquivo PBM (Portable bitmap).\\n");
+    printf("-?, --help  : apresenta essa orientação na tela.\n");
+    printf("-m, --manual : ativa o modo de entrada manual, em que o usuário fornece\n");
+    printf("               todos os dados da imagem informando-os através do teclado.\n");
+    printf("-f, --file  : considera a imagem representada no arquivo PBM (Portable bitmap).\n");
 }
 
 // ----------------------------------------------------
 
 int main(int argc, char *argv[]) {
+    int c;
     const char *nome_programa = argv[0];
     Imagem *img = NULL;
     int opcao = -1; 
@@ -301,38 +296,32 @@ int main(int argc, char *argv[]) {
         return 1;
     }
     
-    do {
-        printf("\n--- Menu ---\n");
-        printf("1. Codificar a imagem (XBP)\n");
-        printf("2. Mostrar a imagem\n");
-        printf("0. Sair\n");
-        printf("Escolha uma opcao: ");
-
-        int c;
-        while ((c = getchar()) != '\n' && c != EOF);
+    printf("\n--- Menu ---\n");
+    printf("1. Codificar a imagem (XBP)\n");
+    printf("2. Mostrar a imagem\n");
+    printf("0. Sair\n");
+    printf("Escolha uma opcao: ");
         
-        if (scanf("%d", &opcao) != 1) {
-            printf("Opção inválida. Tente novamente.\n");
-            opcao = -1; 
-            continue;
-        }
+    if (scanf("%d", &opcao) != 1) {
+        printf("Opção inválida. Tente novamente.\n");
+        opcao = -1; 
+    }
 
-        switch (opcao) {
-            case 1:
-                printf("Codificando imagem de %dx%d...\n", img->l, img->a);
-                char *codigo_final = codificar_imagem(img); 
+    switch (opcao) {
+        case 1:
+            printf("\nCodificando imagem de %dx%d...\n\n", img->a, img->l);
+            char *codigo_final = codificar_imagem(img); 
 
-                if (codigo_final != NULL) {
-                    printf("Código Final: %s\n", codigo_final);
-                } else {
-                    printf("Perdão! Houve um erro durante a codificação. :(\n");
-                }
-                break;
+            if (codigo_final != NULL) {
+                printf("|Código Final: %s|\n", codigo_final);
+            } else {
+                printf("Perdão! Houve um erro durante a codificação. :(\n");
+            }
+            break;
 
-            case 2:
-                printf("\n--- Visualização da Imagem (%dx%d) ---\n", img->l, img->a);
-                printf("'P' = Preto; 'B' = Branco \n\n");
-
+        case 2:
+            printf("\n--- Visualização da Imagem (%dx%d) ---\n", img->a, img->l);
+            printf("'P' = Preto; 'B' = Branco \n\n");
                 for (int i = 0; i < img->a; i++) {
                     for (int j = 0; j < img->l; j++) {
                         int indice = i * img->l + j;
@@ -342,16 +331,13 @@ int main(int argc, char *argv[]) {
                 }
                 break;
 
-            case 0:
-                printf("Saindo do programa.\n");
-                break;
+        case 0:
+            printf("Saindo do programa.\n");
+            break;
 
-            default:
-                printf("Opcao invalida. Tente novamente.\n");
-        }
-    } while (opcao != 0);
-
-    liberaImagem(img); 
+        default:
+            printf("Opcao invalida. Tente novamente.\n");
+   }
     
     return 0;
 }
