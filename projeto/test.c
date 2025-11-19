@@ -187,18 +187,111 @@ char* codificar_imagem(Imagem* img) {
 
 //----------------
 
-int main(int argc, char *argv[]) {
-    if (argc != 2) {
-        printf("Uso: %s <nome_do_arquivo.pbm>\n", argv[0]);
-        return 1;
+void ajuda(const char *nome_programa) {
+    printf("Uso: %s [-? | -m | -f ARQ]\n\n", nome_programa);
+    printf("Argumentos:\n");
+    printf("-?, --help   : apresenta essa orientação na tela.\n");
+    printf("-m, --manual : ativa o modo de entrada manual, em que o usuário fornece\n");
+    printf("               todos os dados da imagem informando-os através do teclado.\n");
+    printf("-f, --file   : considera a imagem representada no arquivo PBM (Portable bitmap).\n");
+}
+
+//----------------
+
+Imagem* ler_imagem_manual() {
+    int a, l;
+    printf("\n--- MODO DE ENTRADA MANUAL ---\n");
+    printf("Informe a altura (linhas) da imagem: ");
+    if (scanf("%d", &a) != 1 || a <= 0) {
+        printf("Erro: Altura inválida.\n");
+        return NULL;
+    }
+    
+    printf("Informe a largura (colunas) da imagem: ");
+    if (scanf("%d", &l) != 1 || l <= 0) {
+        printf("Erro: Largura inválida.\n");
+        return NULL;
     }
 
-    Imagem *img = ler_arquivo_pbm(argv[1]); 
+    // 2. CRIA A ESTRUTURA
+    Imagem *img = criarImagem(l, a);
     if (img == NULL) {
+        printf("Erro: Falha ao alocar memória para a imagem.\n");
+        return NULL;
+    }
+
+    printf("\nInforme os pixels (0 para Branco, 1 para Preto) em ordem: \n");
+    printf("Total de %d pixels a serem informados (linha por linha):\n", a * l);
+    
+    for (int i = 0; i < a; i++) {
+        for (int j = 0; j < l; j++) {
+            int pixel_lido;
+            printf("Pixel [%d, %d]: ", i + 1, j + 1); 
+            
+            if (scanf("%d", &pixel_lido) != 1) {
+                printf("Erro: Entrada não é um número.\n");
+                liberaImagem(img);
+                return NULL;
+            }
+            
+            if (pixel_lido != PRETO && pixel_lido != BRANCO) {
+                printf("Erro: Pixel deve ser 0 (Branco) ou 1 (Preto).\n");
+                liberaImagem(img);
+                return NULL;
+            }
+            
+            int indice = i * (*img).l + j;
+            (*img).dados[indice] = pixel_lido;
+        }
+    }
+
+    printf("\nLeitura manual concluída.\n");
+    return img;
+}
+
+//----------------
+
+int main(int argc, char *argv[]) {
+    const char *nome_programa = argv[0];
+    Imagem *img = NULL;
+    int opcao; 
+    if (argc < 2) {
+        printf("Erro: Argumentos insuficientes.\n");
+        ajuda(nome_programa);
         return 1;
     }
-    int opcao;
 
+    if (strcmp(argv[1], "-?") == 0 || strcmp(argv[1], "--help") == 0) {
+        ajuda(nome_programa);
+        return 0;
+
+    } else if (strcmp(argv[1], "-f") == 0 || strcmp(argv[1], "--file") == 0) {
+        if (argc != 3) {
+            printf("Erro: A opção -f requer o nome do arquivo PBM.\n");
+            ajuda(nome_programa);
+               return 1;
+        }
+    
+        const char *nome_arquivo = argv[2];
+        img = ler_arquivo_pbm(nome_arquivo);
+        if (img == NULL) {
+            printf("Não foi possível carregar a imagem do arquivo.\n");
+            return 1;
+        }
+
+    } else if (strcmp(argv[1], "-m") == 0 || strcmp(argv[1], "--manual") == 0) {
+        img = ler_imagem_manual();
+        if (img == NULL) {
+            printf("Falha na leitura manual da imagem. Saindo.\n");
+            return 1;
+        }
+        
+    } else {
+        printf("Erro: Opção inválida: %s\n", argv[1]);
+        ajuda(nome_programa);
+        return 1;
+    }
+    
     printf("--- Menu ---\n");
     printf("1. Codificar a imagem (XBP)\n");
     printf("2. Mostrar a imagem\n");
